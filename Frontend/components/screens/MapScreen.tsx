@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from "react-native"
+import * as Clipboard from "expo-clipboard"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 import { useRouter, useLocalSearchParams } from "expo-router"
@@ -192,6 +193,15 @@ const MapScreen = () => {
     [debouncedRegionUpdate],
   )
 
+  const copyAddressToClipboard = useCallback(() => {
+    if (addressInfo?.formattedAddress) {
+      Clipboard.setStringAsync(addressInfo.formattedAddress)
+      showAlert("Copied!", "Address copied to clipboard")
+    } else {
+      showAlert("No Address", "No address available to copy")
+    }
+  }, [addressInfo, showAlert])
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -298,9 +308,12 @@ const MapScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.actionButton, styles.secondaryButton]} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={20} color="#5dade2" />
-          <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>Back</Text>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.copyButton]} 
+          onPress={copyAddressToClipboard}
+          disabled={!addressInfo?.formattedAddress}
+        >
+          <Ionicons name="copy" size={20} color="#5dade2" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -492,6 +505,14 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: "#5dade2",
   },
+  copyButton: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#5dade2",
+    flex: 0,
+    width: 50,
+    paddingHorizontal: 0,
+  },
 })
 
-export default MapScreen
+export default MapScreen;
