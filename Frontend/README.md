@@ -1,50 +1,110 @@
-# Welcome to your Expo app 👋
+# 📱 Sam Frontend – AI-Powered Smart Shopping Assistant
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is the **Frontend module** of **SAM**, an AI-driven in-store shopping assistant. The mobile interface is built with **React Native (Expo)** and offers users a seamless, intelligent, and inclusive shopping experience directly within physical retail environments.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Features
 
-   ```bash
-   npm install
-   ```
+### 🔍 Landing Page (LandingScreen.tsx)
+- **Store QR Integration:** Connects user to store inventory by scanning QR codes.
+- **Smart Location Services:**
+  - Requests user location permission.
+  - Retrieves current coordinates and displays nearby stores.
+  - Provides navigation via in-app map.
+- **Nearby Stores Display:**
+  - FlatList rendering of store data.
+  - Allows visual discovery of close store branches.
+- **Interactive Cards:**
+  - Walmart-themed product/offer browsing cards.
+- **Quick Access Shortcuts:**
+  - Profile, Wallet, Location, and QR Scanner icons in the header/footer.
 
-2. Start the app
+### 🗺️ Location Functionality
+- Accurate geolocation via `expo-location`
+- Custom debouncing and alert logic
+- Smart redirection to map screen using coordinates
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 📂 Folder Structure (Relevant to Frontend)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Frontend/
+├── app/
+│   ├── (tabs)/                  # Tab-based screens (map, explore, wallet, etc.)
+│   ├── _layout.tsx              # Root layout for routing and font loading
+    ├── +not-found.tsx           # To handle page not found error
+│
+├── assets/
+│   ├── fonts/                  # Custom fonts like PixelifySans-Regular.ttf
+│   └── images/                 # Images used in cards and UI backgrounds
+│
+├── components/                # Shared UI components (if any)
+├── utils/                     # Utility functions (e.g., debounce)
+│
+├── app.json                   # Expo configuration
+├── .gitignore
+├── package.json
+└── tsconfig.json              # TypeScript configuration
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🛠️ Tech Stack
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Framework:** React Native (Expo)
+- **Navigation:** Expo Router
+- **Location Services:** `expo-location`
+- **Iconography:** `@expo/vector-icons` (Ionicons)
+- **Font Loading:** `expo-font`
+- **State Management:** React hooks
+- **UX Components:** `FlatList`, `ImageBackground`, `TouchableOpacity`, `ActivityIndicator`, `SafeAreaView`
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 📦 Setup Instructions
 
-Join our community of developers creating universal apps.
+Follow these steps to get the frontend up and running:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/codeitnav/Sparkathon-SAM.git
+cd sam/Frontend
+```
+
+### 2. Install Dependencies
+
+Make sure you have Node.js and npm installed. Then run:
+
+```bash
+npm install
+```
+
+### 3. Install Expo CLI (if not already installed)
+
+```bash
+npm install -g expo-cli
+```
+
+### 4. Start the Expo Development Server
+
+```bash
+npx expo start
+```
+
+This will open Expo Dev Tools in your browser.
+
+### 5. Run on Device or Emulator
+
+- Scan the QR code with the **Expo Go app** (iOS/Android)  
+- Or press `i` to open iOS simulator or `a` for Android emulator
+
+### 6. Grant Location Permissions
+
+The app uses geolocation to find nearby stores. Ensure you allow location access when prompted.
+
+---
+
+> ✅ Fonts and images are automatically bundled via the `assets/` folder and referenced locally. No additional configuration is needed.
