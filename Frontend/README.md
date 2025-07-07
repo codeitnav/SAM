@@ -40,7 +40,7 @@ Frontend/
 │   ├── fonts/                  # Custom fonts like PixelifySans-Regular.ttf
 │   └── images/                 # Images used in cards and UI backgrounds
 │
-├── components/                # Shared UI components (if any)
+├── components/                # UI components
 ├── utils/                     # Utility functions (e.g., debounce)
 │
 ├── app.json                   # Expo configuration
