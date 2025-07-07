@@ -6,7 +6,6 @@ engine = pyttsx3.init()
 
 
 def set_voice(language_code="en-in"):
-    """Finds and sets a voice based on language code."""
     voices = engine.getProperty("voices")
     for voice in voices:
         # The language code check can be adapted based on how voices are named on your OS
@@ -36,7 +35,7 @@ def listen():
         audio = r.listen(source)
 
     try:
-        print("👂 Recognizing...")
+        print("Recognizing...")
         query = r.recognize_google(audio, language="en-in")
         print(f"You said: {query}\n")
         return query

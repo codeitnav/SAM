@@ -23,7 +23,6 @@ def recommend_products(query):
 
     # First, try to match keywords for a quick response
     for theme, keywords in RECOMMENDATION_KEYWORDS.items():
-        # If the query matches a theme (e.g., "party") or a keyword in that theme (e.g., "snacks")
         if theme in query or any(keyword in query for keyword in keywords):
             search_terms.update(keywords)
             detected_theme = theme  # Capture the theme
