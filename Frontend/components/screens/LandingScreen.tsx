@@ -63,9 +63,7 @@ const LandingScreen = () => {
   ]);
 
   useEffect(() => {
-    // Remove automatic location fetching on component mount
     return () => {
-      // Cleanup any pending operations
       locationRequestInProgress.current = false;
       alertShownRef.current = false;
     };
@@ -278,7 +276,7 @@ const LandingScreen = () => {
   const keyExtractor = useCallback((item: Store) => item.id, []);
 
   const [fontsLoaded] = useFonts({
-    PixelifySans_400Regular: require("../../assets/fonts/PixelifySans-Regular.ttf"),
+    PixelifySans: require("../../assets/fonts/PixelifySans-Bold.ttf"),
   });
 
   if (!fontsLoaded) return null;
@@ -447,9 +445,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: "bold",
     color: "#5dade2",
-    fontFamily: "PixelifySans_400Regular",
+    fontFamily: "PixelifySans",
   },
   headerRight: {
     flexDirection: "row",
