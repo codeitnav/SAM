@@ -1,28 +1,40 @@
-
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+"use client"
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { Ionicons } from "@expo/vector-icons"
+import { useRouter } from "expo-router"
+import { useAuth } from "@/context/AuthContext"
 
 const ProfileScreen = () => {
-  const router = useRouter();
+  const router = useRouter()
+  const { user, signOut } = useAuth()
+
+  const handleSignOut = () => {
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          await signOut()
+        },
+      },
+    ])
+  }
+
   const menuItems = [
-    { id: 1, title: 'Personal Information', icon: 'person-outline' },
-    { id: 2, title: 'Preferences', icon: 'settings-outline' },
-    { id: 3, title: 'Order History', icon: 'receipt-outline' },
-    { id: 4, title: 'Saved Items', icon: 'heart-outline' },
-    { id: 5, title: 'Help & Support', icon: 'help-circle-outline' },
-    { id: 6, title: 'About', icon: 'information-circle-outline' },
-  ];
+    { id: 1, title: "Personal Information", icon: "person-outline" },
+    { id: 2, title: "Preferences", icon: "settings-outline" },
+    { id: 3, title: "Order History", icon: "receipt-outline" },
+    { id: 4, title: "Saved Items", icon: "heart-outline" },
+    { id: 5, title: "Help & Support", icon: "help-circle-outline" },
+    { id: 6, title: "About", icon: "information-circle-outline" },
+  ]
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#5dade2" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
@@ -32,8 +44,8 @@ const ProfileScreen = () => {
         <View style={styles.avatar}>
           <Ionicons name="person" size={50} color="#5dade2" />
         </View>
-        <Text style={styles.userName}>Welcome User</Text>
-        <Text style={styles.userEmail}>user@example.com</Text>
+        <Text style={styles.userName}>{user?.user_metadata?.full_name || "Welcome User"}</Text>
+        <Text style={styles.userEmail}>{user?.email || "user@example.com"}</Text>
       </View>
 
       <View style={styles.menuSection}>
@@ -44,24 +56,30 @@ const ProfileScreen = () => {
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
           </TouchableOpacity>
         ))}
+
+        <TouchableOpacity style={styles.signOutItem} onPress={handleSignOut}>
+          <Ionicons name="log-out-outline" size={24} color="#ff6b6b" />
+          <Text style={styles.signOutText}>Sign Out</Text>
+          <Ionicons name="chevron-forward" size={20} color="#ccc" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -72,18 +90,18 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   profileSection: {
-    backgroundColor: 'white',
-    alignItems: 'center',
+    backgroundColor: "white",
+    alignItems: "center",
     paddingVertical: 30,
     marginTop: 20,
     marginHorizontal: 15,
     borderRadius: 12,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -92,47 +110,59 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#f0f8ff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f0f8ff",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 15,
   },
   userName: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 5,
   },
   userEmail: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   menuSection: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginTop: 20,
     marginHorizontal: 15,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   menuText: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginLeft: 15,
   },
-});
+  signOutItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  signOutText: {
+    flex: 1,
+    fontSize: 16,
+    color: "#ff6b6b",
+    marginLeft: 15,
+  },
+})
 
-export default ProfileScreen;
+export default ProfileScreen
