@@ -1,16 +1,14 @@
 "use client"
-
 import type React from "react"
 import { View, ActivityIndicator, StyleSheet } from "react-native"
 import { useAuth } from "@/context/AuthContext"
-import AuthScreen from "./screens/AuthScreen"
 
 interface AuthWrapperProps {
   children: React.ReactNode
 }
 
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
-  const { user, loading } = useAuth()
+  const { loading } = useAuth()
 
   if (loading) {
     return (
@@ -20,10 +18,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     )
   }
 
-  if (!user) {
-    return <AuthScreen />
-  }
-
+  // Always show children, don't force authentication
   return <>{children}</>
 }
 
@@ -36,4 +31,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default AuthWrapper;
+export default AuthWrapper

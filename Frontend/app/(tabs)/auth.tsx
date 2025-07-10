@@ -1,6 +1,5 @@
 "use client"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -16,16 +15,22 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 import { useAuth } from "@/context/AuthContext"
+import { useRouter, useLocalSearchParams } from "expo-router"
 
 const AuthScreen = () => {
-  const [isLogin, setIsLogin] = useState(true)
+  const router = useRouter()
+  const { mode } = useLocalSearchParams()
+  const [isLogin, setIsLogin] = useState(mode === "signin" || mode !== "signup")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fullName, setFullName] = useState("")
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-
   const { signIn, signUp, resetPassword } = useAuth()
+
+  useEffect(() => {
+    setIsLogin(mode === "signin" || mode !== "signup")
+  }, [mode])
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -39,7 +44,6 @@ const AuthScreen = () => {
     }
 
     setLoading(true)
-
     try {
       let result
       if (isLogin) {
@@ -50,8 +54,12 @@ const AuthScreen = () => {
 
       if (result.error) {
         Alert.alert("Error", result.error)
-      } else if (!isLogin) {
-        Alert.alert("Success", "Account created successfully! Please check your email to verify your account.")
+      } else {
+        if (!isLogin) {
+          Alert.alert("Success", "Account created successfully! Please check your email to verify your account.")
+        }
+        // Navigate back to profile after successful auth
+        router.back()
       }
     } catch (error: any) {
       Alert.alert("Error", error.message)
@@ -89,6 +97,9 @@ const AuthScreen = () => {
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardView}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => router.back()}>
+              <Ionicons name="close" size={24} color="#5dade2" />
+            </TouchableOpacity>
             <Text style={styles.appTitle}>SAM</Text>
             <Text style={styles.subtitle}>{isLogin ? "Welcome back!" : "Create your account"}</Text>
           </View>
@@ -176,6 +187,13 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     marginBottom: 40,
+    position: "relative",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    padding: 5,
   },
   appTitle: {
     fontSize: 48,

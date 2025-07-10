@@ -1,13 +1,13 @@
-"use client"
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Ionicons } from "@expo/vector-icons"
-import { useRouter } from "expo-router"
-import { useAuth } from "@/context/AuthContext"
+"use client";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useAuth } from "@/context/AuthContext";
 
 const ProfileScreen = () => {
-  const router = useRouter()
-  const { user, signOut } = useAuth()
+  const router = useRouter();
+  const { user, signOut } = useAuth();
 
   const handleSignOut = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
@@ -16,11 +16,19 @@ const ProfileScreen = () => {
         text: "Sign Out",
         style: "destructive",
         onPress: async () => {
-          await signOut()
+          await signOut();
         },
       },
-    ])
-  }
+    ]);
+  };
+
+  const handleSignUp = () => {
+    router.push("/(tabs)/auth?mode=signup" as const)
+  };
+
+  const handleSignIn = () => {
+    router.push("/(tabs)/auth?mode=signin" as const)
+  };
 
   const menuItems = [
     { id: 1, title: "Personal Information", icon: "person-outline" },
@@ -29,12 +37,15 @@ const ProfileScreen = () => {
     { id: 4, title: "Saved Items", icon: "heart-outline" },
     { id: 5, title: "Help & Support", icon: "help-circle-outline" },
     { id: 6, title: "About", icon: "information-circle-outline" },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Ionicons name="arrow-back" size={24} color="#5dade2" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
@@ -44,28 +55,65 @@ const ProfileScreen = () => {
         <View style={styles.avatar}>
           <Ionicons name="person" size={50} color="#5dade2" />
         </View>
-        <Text style={styles.userName}>{user?.user_metadata?.full_name || "Welcome User"}</Text>
-        <Text style={styles.userEmail}>{user?.email || "user@example.com"}</Text>
+        {user ? (
+          <>
+            <Text style={styles.userName}>
+              {user?.user_metadata?.full_name || "Welcome User"}
+            </Text>
+            <Text style={styles.userEmail}>
+              {user?.email || "user@example.com"}
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.userName}>Welcome to SAM</Text>
+            <Text style={styles.userEmail}>Sign in to access your account</Text>
+          </>
+        )}
       </View>
 
-      <View style={styles.menuSection}>
-        {menuItems.map((item) => (
-          <TouchableOpacity key={item.id} style={styles.menuItem}>
-            <Ionicons name={item.icon as any} size={24} color="#5dade2" />
-            <Text style={styles.menuText}>{item.title}</Text>
+      {!user ? (
+        // Show auth buttons for non-authenticated users
+        <View style={styles.authSection}>
+          <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+            <Ionicons name="person-add-outline" size={24} color="white" />
+            <Text style={styles.signUpButtonText}>Create Account</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
+            <Ionicons name="log-in-outline" size={24} color="#5dade2" />
+            <Text style={styles.signInButtonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        // Show menu for authenticated users
+        <View style={styles.menuSection}>
+          {menuItems.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.menuItem}>
+              <Ionicons name={item.icon as any} size={24} color="#5dade2" />
+              <Text style={styles.menuText}>{item.title}</Text>
+              <Ionicons name="chevron-forward" size={20} color="#ccc" />
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity style={styles.signOutItem} onPress={handleSignOut}>
+            <Ionicons name="log-out-outline" size={24} color="#ff6b6b" />
+            <Text style={styles.signOutText}>Sign Out</Text>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
           </TouchableOpacity>
-        ))}
+        </View>
+      )}
 
-        <TouchableOpacity style={styles.signOutItem} onPress={handleSignOut}>
-          <Ionicons name="log-out-outline" size={24} color="#ff6b6b" />
-          <Text style={styles.signOutText}>Sign Out</Text>
-          <Ionicons name="chevron-forward" size={20} color="#ccc" />
-        </TouchableOpacity>
-      </View>
+      {!user && (
+        <View style={styles.guestNotice}>
+          <Ionicons name="information-circle-outline" size={20} color="#666" />
+          <Text style={styles.guestNoticeText}>
+            You&apos;re browsing as a guest. Sign in to save your preferences
+            and access all features.
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -125,6 +173,49 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
   },
+  authSection: {
+    backgroundColor: "white",
+    marginTop: 20,
+    marginHorizontal: 15,
+    borderRadius: 12,
+    padding: 20,
+    gap: 15,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  signUpButton: {
+    backgroundColor: "#5dade2",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 15,
+    borderRadius: 8,
+    gap: 10,
+  },
+  signUpButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  signInButton: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#5dade2",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 15,
+    borderRadius: 8,
+    gap: 10,
+  },
+  signInButtonText: {
+    color: "#5dade2",
+    fontSize: 16,
+    fontWeight: "600",
+  },
   menuSection: {
     backgroundColor: "white",
     marginTop: 20,
@@ -163,6 +254,27 @@ const styles = StyleSheet.create({
     color: "#ff6b6b",
     marginLeft: 15,
   },
-})
+  guestNotice: {
+    backgroundColor: "white",
+    marginTop: 20,
+    marginHorizontal: 15,
+    borderRadius: 12,
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  guestNoticeText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+  },
+});
 
-export default ProfileScreen
+export default ProfileScreen;
