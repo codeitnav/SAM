@@ -54,20 +54,28 @@ def get_recipe_from_api(products):
     if isinstance(products, str):
         products = [products]
 
-    # TheMealDB API for filtering by main ingredient
-    # We will use the first product as the main ingredient for the query
     query = products[0]
-    url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={query}"
+
+    # First try searching by dish name
+    url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={query}"
 
     try:
         r = requests.get(url)
-        r.raise_for_status()  # Raise an exception for bad status codes
+        r.raise_for_status()
         data = r.json()
 
         if data.get("meals"):
-            # If other ingredients are provided, we can filter the results further
-            # For now, we return the top 3 based on the primary ingredient
             return [meal["strMeal"] for meal in data["meals"][:3]]
+
+        # If no results by dish name, try by ingredient
+        url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={query}"
+        r = requests.get(url)
+        r.raise_for_status()
+        data = r.json()
+
+        if data.get("meals"):
+            return [meal["strMeal"] for meal in data["meals"][:3]]
+
         return []
     except requests.exceptions.RequestException as e:
         print(f"API Error: {e}")
@@ -153,8 +161,41 @@ def handle_recipe_search(products_to_process, input_method="text"):
         if api_recipes:
             speak_wrapper(f"Here are some online recipes for '{product_names}':")
             print(f"Here are some online recipes for '{product_names}':")
-            for r in api_recipes:
-                print(f"→ {r}")
+            for i, recipe in enumerate(api_recipes, 1):
+                print(f"{i}. {recipe}")
+
+            # Ask user to choose a recipe from API results
+            try:
+                choice_input = input(
+                    f"Enter the number of the recipe you want (1-{len(api_recipes)}): "
+                )
+                choice = int(choice_input)
+                if 1 <= choice <= len(api_recipes):
+                    chosen_recipe = api_recipes[choice - 1]
+                    speak_wrapper(
+                        f"Great choice! Fetching the recipe for {chosen_recipe}..."
+                    )
+                    print(f"Great choice! Fetching the recipe for {chosen_recipe}...")
+
+                    # Get full recipe details from API
+                    api_details = get_recipe_details_from_api(chosen_recipe)
+                    if api_details:
+                        formatted_recipe = format_recipe_response(api_details)
+                        speak_wrapper(formatted_recipe)
+                        print(formatted_recipe)
+                    else:
+                        speak_wrapper(
+                            "I'm sorry, I couldn't retrieve the details for that recipe."
+                        )
+                        print(
+                            "I'm sorry, I couldn't retrieve the details for that recipe."
+                        )
+                else:
+                    speak_wrapper("Invalid choice. Please try again.")
+                    print("Invalid choice. Please try again.")
+            except (ValueError, IndexError):
+                speak_wrapper("Invalid input. Please enter a valid number.")
+                print("Invalid input. Please enter a valid number.")
         else:
             speak_wrapper(
                 f"Sorry, I couldn't find any specific recipes for '{product_names}' online either."
@@ -403,3 +444,45 @@ def clean_ingredient_name(ingredient):
         return words[0]
     else:
         return ingredient
+
+
+def get_recipe_details_from_api(recipe_name):
+    """Gets full recipe details from TheMealDB API."""
+    url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={recipe_name}"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("meals") and len(data["meals"]) > 0:
+            meal = data["meals"][0]
+
+            # Extract ingredients with measurements
+            ingredients = []
+            for i in range(1, 21):  # TheMealDB has up to 20 ingredients
+                ingredient = meal.get(f"strIngredient{i}")
+                measure = meal.get(f"strMeasure{i}")
+
+                if ingredient and ingredient.strip():
+                    if measure and measure.strip():
+                        ingredients.append(f"{measure.strip()} {ingredient.strip()}")
+                    else:
+                        ingredients.append(ingredient.strip())
+
+            return {
+                "Name": meal["strMeal"],
+                "RecipeInstructions": meal.get("strInstructions", ""),
+                "RecipeIngredientParts": ingredients,
+                "AggregatedRating": "N/A",
+                "RecipeCategory": meal.get("strCategory", ""),
+                "CookTime": "N/A",
+                "PrepTime": "N/A",
+            }
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"API Error: {e}")
+        return None
+    except ValueError:
+        print("API Error: Could not decode JSON response.")
+        return None

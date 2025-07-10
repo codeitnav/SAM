@@ -95,7 +95,15 @@ def main():
             for product in products_to_process:
                 if not product:
                     continue
-                inventory_results.append(search_inventory(product))
+                result = search_inventory(product)
+
+                # Check if user canceled the selection
+                if "Selection canceled" in result:
+                    speak_wrapper(result)
+                    print(result)
+                    return  # Exit early, don't process further or format with LLM
+
+                inventory_results.append(result)
                 # Proactive sustainable suggestion if available
                 if "eco" not in filter_val and "sustain" not in filter_val:
                     alt = suggest_sustainable(product)
@@ -134,7 +142,15 @@ def main():
                 for product in products_to_process:
                     if not product:
                         continue
-                    inventory_results.append(search_inventory(product))
+                    result = search_inventory(product)
+
+                    # Check if user canceled the selection
+                    if "Selection canceled" in result:
+                        speak_wrapper(result)
+                        print(result)
+                        return  # Exit early, don't process further or format with LLM
+
+                    inventory_results.append(result)
 
                 if inventory_results:
                     formatted_response = format_inventory_response(inventory_results)

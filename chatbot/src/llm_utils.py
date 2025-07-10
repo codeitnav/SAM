@@ -25,7 +25,7 @@ Here are the possible intents:
 - "category_search": When the user is looking for items within a category (e.g., "household items", "cleaning products", "snacks").
 - "category_list": When the user wants to see all available categories (e.g., "what categories do you have?", "show me all sections", "What type of products do you have?").
 - "recipe": When the user wants a recipe using some ingredients. (eg. "What can I make with eggs and flour?", "What can I cook with chicken and rice?")
-- "dish_ingredients": When the user wants to know what ingredients they need for a specific dish (e.g., "what do I need for ramen?", "ingredients for pasta", "I want to cook ramen").
+- "dish_ingredients": When the user wants to know what ingredients they need for a specific dish (e.g., "what do I need for ramen?", "ingredients for pasta", "I want to cook ramen", "I want to eat ramen", "I want to make pasta", "I need ingredients for pizza").
 - "suggestion": When the user is asking for recommendations or ideas (e.g., "what should I get for a party?").
 - "sustainability": When the user is asking for eco-friendly options.
 - "greeting": When the user is greeting or saying hello.
@@ -54,6 +54,9 @@ Examples:
 - "Recipe using eggs and flour" -> {{"intent": "recipe", "product": ["eggs", "flour"], "filter": ""}}
 - "What do I need for ramen?" -> {{"intent": "dish_ingredients", "product": "ramen", "filter": ""}}
 - "Ingredients for chocolate cake" -> {{"intent": "dish_ingredients", "product": "chocolate cake", "filter": ""}}
+- "I want to eat ramen" -> {{"intent": "dish_ingredients", "product": "ramen", "filter": ""}}
+- "I want to make pasta" -> {{"intent": "dish_ingredients", "product": "pasta", "filter": ""}}
+- "Can you give me a recipe for pizza?" -> {{"intent": "recipe", "product": "pizza", "filter": ""}}
 - "Do you have plastic cups and plates?" -> {{"intent": "product_search", "product": ["plastic cups", "plates"], "filter": ""}}
 - "Hello" -> {{"intent": "greeting", "product": "", "filter": ""}}
 - "Hi there" -> {{"intent": "greeting", "product": "", "filter": ""}}
