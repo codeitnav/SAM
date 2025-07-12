@@ -1,9 +1,0 @@
-streamlit
-fastapi
-uvicorn
-pandas
-requests
-beautifulsoup4
-python-dotenv
-speechrecognition
-pyttsx3
