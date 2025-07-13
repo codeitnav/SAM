@@ -1,5 +1,5 @@
 // WebSocket configuration - Update this to your actual backend URL
-const WS_URL = "ws://192.168.40.28:8000/api/v1/ask-sam?store_id=1"
+const WS_URL = "ws://<ip-address>/api/v1/ask-sam?store_id=1"
 
 export interface ChatMessage {
   id: string
