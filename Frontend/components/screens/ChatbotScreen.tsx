@@ -162,6 +162,7 @@ const ChatbotScreen = () => {
 
     const userMessage = createUserMessage(inputText)
     setMessages((prev) => [...prev, userMessage])
+
     const messageText = inputText.trim()
     setInputText("")
 
@@ -174,6 +175,7 @@ const ChatbotScreen = () => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current)
     }
+
     typingTimeoutRef.current = setTimeout(() => {
       console.log("Typing indicator timeout - hiding")
       setIsTyping(false)
@@ -191,7 +193,6 @@ const ChatbotScreen = () => {
         clearTimeout(typingTimeoutRef.current)
         typingTimeoutRef.current = null
       }
-
       // Show error if message couldn't be sent
       const errorMessage = createBotMessage("Failed to send message. Please check your connection and try again.", true)
       setMessages((prev) => [...prev, errorMessage])
@@ -217,6 +218,16 @@ const ChatbotScreen = () => {
       </Text>
     </View>
   )
+
+  // Render typing indicator as footer component
+  const renderFooter = () => {
+    if (!isTyping) return null
+    return (
+      <View style={styles.typingIndicatorContainer}>
+        <TypingIndicator isVisible={isTyping} />
+      </View>
+    )
+  }
 
   const retryConnection = async () => {
     setIsLoading(true)
@@ -298,6 +309,7 @@ const ChatbotScreen = () => {
           keyExtractor={(item) => item.id}
           style={styles.messagesList}
           contentContainerStyle={styles.messagesContent}
+          ListFooterComponent={renderFooter}
           onContentSizeChange={() => {
             flatListRef.current?.scrollToEnd({ animated: true })
           }}
@@ -305,9 +317,6 @@ const ChatbotScreen = () => {
             flatListRef.current?.scrollToEnd({ animated: false })
           }}
         />
-
-        {/* Typing Indicator */}
-        <TypingIndicator isVisible={isTyping} />
       </View>
 
       {/* Input Area */}
@@ -325,7 +334,6 @@ const ChatbotScreen = () => {
           <TouchableOpacity style={styles.micButton}>
             <Ionicons name="mic" size={24} color="#5dade2" />
           </TouchableOpacity>
-
           <TextInput
             style={styles.textInput}
             placeholder={isConnected ? "Type here" : "No connection..."}
@@ -337,7 +345,6 @@ const ChatbotScreen = () => {
             blurOnSubmit={false}
             editable={isConnected}
           />
-
           <TouchableOpacity
             style={[styles.sendButton, { opacity: inputText.trim() && isConnected ? 1 : 0.5 }]}
             onPress={sendMessage}
@@ -459,6 +466,11 @@ const styles = StyleSheet.create({
   },
   errorMessageText: {
     color: "#721c24",
+  },
+  typingIndicatorContainer: {
+    alignSelf: "flex-start",
+    marginTop: 10,
+    marginBottom: 5,
   },
   inputContainer: {
     backgroundColor: "white",
