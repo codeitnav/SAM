@@ -37,15 +37,22 @@ async def get_input(send, receive, input_method="text"):
 
 
 async def assistant(send, receive, inventory_csv_url):
-    await send(json.dumps({"message":"Hello there! I'm SAM AI, your friendly shopping assistant! 🛒"}))
-    await send(json.dumps({"message":"I can help you with:"}))
-    await send(json.dumps({"message":"  • Finding products in our inventory"}))
-    await send(json.dumps({"message":"  • Suggesting recipes and ingredients"}))
-    await send(json.dumps({"message":"  • Recommending sustainable alternatives"}))
-    await send(json.dumps({"message":"  • General shopping assistance"}))
-    await send(json.dumps({"message":
+    """
+    Sends a single, merged welcome message from SAM AI.
+
+    Args:
+        send: The WebSocket send function (e.g., from `websocket.send`).
+    """
+    welcome_message = (
+        "Hello there! I'm SAM AI, your friendly shopping assistant! 🛒\n\n"
+        "I can help you with:\n"
+        "   • Finding products in our inventory\n"
+        "   • Suggesting recipes and ingredients\n"
+        "   • Recommending sustainable alternatives\n"
+        "   • General shopping assistance\n"
         "\nJust ask me anything related to shopping, and I'll do my best to help!"
-    }))
+    )
+    await send(json.dumps({"message": welcome_message}))
 
     # input_method = ""
     # while input_method not in ["text", "voice"]:

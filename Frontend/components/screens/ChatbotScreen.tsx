@@ -17,18 +17,11 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import WebSocketService, { type ChatMessage, type WebSocketMessage } from "@/utils/WebSocketService"
-import TypingIndicator from "../TypingIndicator"
+import TypingIndicator from "../TypingIndicator" // Correct import path
 
 const ChatbotScreen = () => {
   const router = useRouter()
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome-1",
-      text: "Hello! I'm SAM, your shopping assistant. How can I help you today?",
-      isUser: false,
-      timestamp: new Date(),
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [inputText, setInputText] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
@@ -64,12 +57,12 @@ const ChatbotScreen = () => {
     // Initialize WebSocket connection
     const initializeChat = async () => {
       try {
-        console.log("Initializing WebSocket connection...")
+        console.log("🚀 Initializing WebSocket connection...")
         await WebSocketService.connect()
-        console.log("WebSocket connected successfully")
+        console.log("✅ WebSocket connected successfully")
         setIsLoading(false)
       } catch (error) {
-        console.error("WebSocket connection failed:", error)
+        console.error("❌ WebSocket connection failed:", error)
         setIsLoading(false)
         // Replace welcome message with connection error
         setMessages([
@@ -86,7 +79,7 @@ const ChatbotScreen = () => {
 
     // Set up WebSocket event listeners
     WebSocketService.onConnectionChange((connected) => {
-      console.log("Connection status changed:", connected)
+      console.log("🔌 Connection status changed:", connected)
       setIsConnected(connected)
       if (!connected && !isLoading) {
         const errorMessage = createBotMessage("Connection lost. Please check your internet connection.", true)
@@ -110,7 +103,7 @@ const ChatbotScreen = () => {
   }, [])
 
   const handleWebSocketMessage = (wsMessage: WebSocketMessage) => {
-    console.log("Received WebSocket message:", wsMessage)
+    console.log("📨 Received WebSocket message:", wsMessage)
 
     // Clear any existing typing timeout
     if (typingTimeoutRef.current) {
@@ -119,34 +112,22 @@ const ChatbotScreen = () => {
     }
 
     switch (wsMessage.type) {
-      case "typing_start":
-        console.log("Bot started typing")
-        setIsTyping(true)
-        break
-
-      case "typing_end":
-        console.log("Bot stopped typing")
-        setIsTyping(false)
-        break
-
       case "bot_response":
-        console.log("Bot response received:", wsMessage.message)
+        console.log("🧠 Bot response received:", wsMessage.message)
         setIsTyping(false)
         if (wsMessage.message) {
           const botMessage = createBotMessage(wsMessage.message)
           setMessages((prev) => [...prev, botMessage])
         }
         break
-
       case "error":
-        console.error("WebSocket error:", wsMessage.error)
+        console.error("⚠ WebSocket error:", wsMessage.error)
         setIsTyping(false)
         const errorMessage = createBotMessage(wsMessage.error || "Something went wrong. Please try again.", true)
         setMessages((prev) => [...prev, errorMessage])
         break
-
       default:
-        console.log("Unknown message type:", wsMessage.type)
+        console.log("❓ Unknown message type:", wsMessage.type)
     }
   }
 
@@ -166,25 +147,24 @@ const ChatbotScreen = () => {
     const messageText = inputText.trim()
     setInputText("")
 
-    console.log("Sending message:", messageText)
+    console.log("📤 Sending message:", messageText)
 
     // Show typing indicator immediately
     setIsTyping(true)
 
-    // Set a fallback timeout for typing indicator (10 seconds)
+    // Set a fallback timeout for typing indicator (15 seconds)
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current)
     }
-
     typingTimeoutRef.current = setTimeout(() => {
-      console.log("Typing indicator timeout - hiding")
+      console.log("⏰ Typing indicator timeout - hiding")
       setIsTyping(false)
       // Add timeout error message
       const timeoutMessage = createBotMessage("Request timed out. Please try again.", true)
       setMessages((prev) => [...prev, timeoutMessage])
-    }, 10000)
+    }, 15000)
 
-    // Send message via WebSocket
+    // Send message via WebSocket (plain string like dummy frontend)
     const sent = WebSocketService.sendMessage(messageText)
     if (!sent) {
       // Clear typing indicator and timeout
@@ -232,7 +212,7 @@ const ChatbotScreen = () => {
   const retryConnection = async () => {
     setIsLoading(true)
     try {
-      console.log("Retrying connection...")
+      console.log("🔄 Retrying connection...")
       await WebSocketService.connect()
       setIsLoading(false)
       // Reset to welcome message on successful connection
@@ -245,7 +225,7 @@ const ChatbotScreen = () => {
         },
       ])
     } catch (error) {
-      console.error("Retry connection failed:", error)
+      console.error("❌ Retry connection failed:", error)
       setIsLoading(false)
       const errorMessage = createBotMessage("Still unable to connect. Please check your internet connection.", true)
       setMessages((prev) => [...prev, errorMessage])
@@ -419,7 +399,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   headerSpacer: {
-    width: 34, // Same width as back button to center the title
+    width: 34,
   },
   messagesContainer: {
     flex: 1,

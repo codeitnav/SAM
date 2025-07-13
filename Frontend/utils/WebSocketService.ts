@@ -1,5 +1,5 @@
 // WebSocket configuration - Update this to your actual backend URL
-const WS_URL = "ws://<ip-address>/api/v1/ask-sam?store_id=1"
+const WS_URL = "ws://192.168.40.28:8000/api/v1/ask-sam?store_id=1"
 
 export interface ChatMessage {
   id: string
@@ -10,10 +10,9 @@ export interface ChatMessage {
 }
 
 export interface WebSocketMessage {
-  type: "user_message" | "bot_response" | "typing_start" | "typing_end" | "error"
+  type: "bot_response" | "error" | "connection"
   message?: string
   error?: string
-  timestamp?: string
 }
 
 class WebSocketService {
@@ -24,7 +23,6 @@ class WebSocketService {
   private maxReconnectAttempts = 5
   private reconnectDelay = 3000
   private isConnecting = false
-  private pingInterval: NodeJS.Timeout | null = null
 
   async connect(): Promise<void> {
     if (this.isConnecting || this.isConnected()) {
@@ -40,39 +38,49 @@ class WebSocketService {
         this.ws = new WebSocket(WS_URL)
 
         this.ws.onopen = () => {
-          console.log("WebSocket connected successfully")
+          console.log("✅ WebSocket connected successfully")
           this.isConnecting = false
           this.reconnectAttempts = 0
-          this.startPing()
           this.notifyConnectionHandlers(true)
           resolve()
         }
 
         this.ws.onmessage = (event) => {
-          console.log("Raw WebSocket message received:", event.data)
+          console.log("📨 Raw WebSocket message received:", event.data)
+          
           try {
-            const message: WebSocketMessage = JSON.parse(event.data)
-            console.log("Parsed WebSocket message:", message)
-            this.notifyMessageHandlers(message)
+            // Try to parse as JSON first (like the dummy frontend)
+            const response = JSON.parse(event.data)
+            console.log("📋 Parsed JSON response:", response)
+            
+            // Handle the response based on the dummy frontend pattern
+            if (response.message) {
+              this.notifyMessageHandlers({
+                type: "bot_response",
+                message: response.message
+              })
+            } else {
+              // If no message field, treat the whole response as the message
+              this.notifyMessageHandlers({
+                type: "bot_response",
+                message: JSON.stringify(response)
+              })
+            }
           } catch (error) {
-            console.error("Error parsing WebSocket message:", error)
-            console.error("Raw message data:", event.data)
-
-            // Try to handle as plain text response
+            console.log("📝 Treating as plain text response:", event.data)
+            // If not JSON, treat as plain text (fallback)
             this.notifyMessageHandlers({
               type: "bot_response",
-              message: event.data,
-              timestamp: new Date().toISOString(),
+              message: event.data
             })
           }
         }
 
         this.ws.onclose = (event) => {
-          console.log("WebSocket disconnected. Code:", event.code, "Reason:", event.reason)
+          console.log("❌ WebSocket disconnected. Code:", event.code, "Reason:", event.reason)
           this.isConnecting = false
-          this.stopPing()
           this.notifyConnectionHandlers(false)
-
+          
           // Only attempt reconnect if it wasn't a manual close
           if (event.code !== 1000) {
             this.handleReconnect()
@@ -80,16 +88,20 @@ class WebSocketService {
         }
 
         this.ws.onerror = (error) => {
-          console.error("WebSocket error:", error)
+          console.error("⚠ WebSocket error:", error)
           this.isConnecting = false
           this.notifyConnectionHandlers(false)
+          this.notifyMessageHandlers({
+            type: "error",
+            error: "WebSocket connection error"
+          })
           reject(error)
         }
 
         // Set a timeout for connection
         setTimeout(() => {
           if (this.isConnecting) {
-            console.log("WebSocket connection timeout")
+            console.log("⏰ WebSocket connection timeout")
             this.isConnecting = false
             if (this.ws) {
               this.ws.close()
@@ -99,50 +111,32 @@ class WebSocketService {
         }, 10000) // 10 second timeout
       } catch (error) {
         this.isConnecting = false
-        console.error("Failed to create WebSocket:", error)
+        console.error("❌ Failed to create WebSocket:", error)
         reject(error)
       }
     })
   }
 
-  private startPing(): void {
-    this.stopPing()
-    this.pingInterval = setInterval(() => {
-      if (this.isConnected()) {
-        try {
-          this.ws!.send(JSON.stringify({ type: "ping" }))
-        } catch (error) {
-          console.error("Error sending ping:", error)
-        }
-      }
-    }, 30000) // Ping every 30 seconds
-  }
-
-  private stopPing(): void {
-    if (this.pingInterval) {
-      clearInterval(this.pingInterval)
-      this.pingInterval = null
-    }
-  }
-
   private handleReconnect(): void {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++
-      console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
-
+      console.log(`🔄 Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
       setTimeout(() => {
         this.connect().catch((error) => {
-          console.error("Reconnection failed:", error)
+          console.error("❌ Reconnection failed:", error)
         })
       }, this.reconnectDelay * this.reconnectAttempts) // Exponential backoff
     } else {
-      console.log("Max reconnection attempts reached")
+      console.log("🚫 Max reconnection attempts reached")
+      this.notifyMessageHandlers({
+        type: "error",
+        error: "Unable to reconnect to server"
+      })
     }
   }
 
   disconnect(): void {
-    console.log("Manually disconnecting WebSocket")
-    this.stopPing()
+    console.log("👋 Manually disconnecting WebSocket")
     if (this.ws) {
       this.ws.close(1000, "Manual disconnect")
       this.ws = null
@@ -152,22 +146,21 @@ class WebSocketService {
 
   sendMessage(message: string): boolean {
     if (!this.isConnected()) {
-      console.log("WebSocket not connected, cannot send message")
+      console.log("❌ WebSocket not connected, cannot send message")
       return false
     }
 
     try {
-      const wsMessage: WebSocketMessage = {
-        type: "user_message",
-        message: message,
-        timestamp: new Date().toISOString(),
-      }
-
-      console.log("Sending WebSocket message:", wsMessage)
-      this.ws!.send(JSON.stringify(wsMessage))
+      // Send just the message string (like the dummy frontend)
+      console.log("📤 Sending message:", message)
+      this.ws!.send(message)
       return true
     } catch (error) {
-      console.error("Error sending message:", error)
+      console.error("❌ Error sending message:", error)
+      this.notifyMessageHandlers({
+        type: "error",
+        error: "Failed to send message"
+      })
       return false
     }
   }
@@ -185,7 +178,7 @@ class WebSocketService {
       try {
         handler(message)
       } catch (error) {
-        console.error("Error in message handler:", error)
+        console.error("❌ Error in message handler:", error)
       }
     })
   }
@@ -195,7 +188,7 @@ class WebSocketService {
       try {
         handler(connected)
       } catch (error) {
-        console.error("Error in connection handler:", error)
+        console.error("❌ Error in connection handler:", error)
       }
     })
   }
