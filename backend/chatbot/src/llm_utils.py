@@ -4,8 +4,7 @@ import json
 from dotenv import load_dotenv
 
 load_dotenv()
-OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
-
+OPENROUTER_KEY = "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"
 
 def extract_intent(query):
     headers = {

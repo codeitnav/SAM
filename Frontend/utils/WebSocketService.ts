@@ -151,7 +151,7 @@ class WebSocketService {
     }
 
     try {
-      // Send just the message string (like the dummy frontend)
+      // Send just the message string 
       console.log("📤 Sending message:", message)
       this.ws!.send(message)
       return true
