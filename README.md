@@ -30,18 +30,21 @@ Speech-to-text (SpeechRecognition) and text-to-speech (pyttsx3) deliver a hands-
 
 ---
 
-##  Architecture & Tech Stack
+## 🏗️ Architecture & Tech Stack
 
 ```text
-+------------+      +--------------+      +--------------+
-| React/Expo | <--> |   FastAPI    | <--> | PostgreSQL & |
-|  Frontend  |      |   Backend    |      |  Supabase    |
-+------------+      +--------------+      +--------------+
-       ↑                   ↓                   ↑
- Speech ↔ AI Intent ↔ Recipe Scrape + Pandas   |
-Recognition           OpenRouter API           |
-       ↓                                         
-     pyttsx3                                   
++------------+      +-------------------------------------+      +--------------+
+| React/Expo | <--> |           FastAPI Backend           | <--> | PostgreSQL & |
+|  Frontend  |      | +-------------------------------+   |      |  Supabase    |
++------------+      | |           AI Engine           |   |      +--------------+
+                    | | ┌─────────────────────────────┐   |   
+                    | | │  • Intent Classification    │   |   
+                    | | │  • LLM (OpenRouter API)     │   |   
+                    | | │  • Recipe Scraping (BS4)    │   |    
+                    | | │  • Data Parsing (Pandas)    │   |   
+                    | | │  • Speech In/Out (SR & TTS) │   |   
+                    | | └─────────────────────────────┘   |   
+                    +-------------------------------------+                                 
 ```
 
 - **Frontend**: React Native (Expo Go)  
@@ -84,7 +87,6 @@ cd backend/API
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 4. Chatbot Service  
@@ -93,7 +95,12 @@ cd ../chatbot
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 5000 --reload
+
+```
+### 5. Running in Root
+```bash
+cd ../SAM
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ---
@@ -131,7 +138,16 @@ uvicorn main:app --host 0.0.0.0 --port 5000 --reload
 We welcome code improvements, UX enhancements, or fresh comic panels ! Please fork, branch, and submit PRs with clear issue references.
 
 ---
+##  Authors
+Navya Srivastava – Frontend development & integration of services.
 
+Ekansh Dubey – Dataset creation & UI design; Frontend assistance.
+
+Aayush Chauhan – Chatbot core; backend assistance.
+
+Manish Sharma – Supabase, FastAPI & backend development.
+
+---
 ##  License
 
 This project is MIT-licensed. Let’s spark smarter, greener retail together.
