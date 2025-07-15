@@ -128,10 +128,10 @@ uvicorn main:app --host 0.0.0.0 --port 5000 --reload
 
 ##  Contributing
 
-We welcome code improvements, UX enhancements, or fresh comic panels !. Please fork, branch, and submit PRs with clear issue references.
+We welcome code improvements, UX enhancements, or fresh comic panels ! Please fork, branch, and submit PRs with clear issue references.
 
 ---
 
 ##  License
 
-This project is MIT-licensed. Let’s spark smarter, greener retail—together.
+This project is MIT-licensed. Let’s spark smarter, greener retail together.
